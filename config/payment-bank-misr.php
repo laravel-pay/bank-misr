@@ -8,6 +8,7 @@ return [
         "name" => env("BANK_MISR_MERCHANT_NAME"),
     ],
     "currency" => "EGP",
+
     "success_url" => env("BANK_MISR_SUCCESS_URL"),
     "fail_url" => env("BANK_MISR_FAIL_URL"),
 ];

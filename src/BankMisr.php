@@ -5,33 +5,33 @@ namespace LaravelPay\BankMisr;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use LaravelPay\BankMisr\Common\Contracts\RequiredFields;
+use LaravelPay\BankMisr\Common\Traits\HasHandelRedirects;
 use LaravelPay\BankMisr\Common\Traits\HasRequiredFields;
 
 class BankMisr implements RequiredFields
 {
+    use HasHandelRedirects;
     use HasRequiredFields;
 
     private string $api = "https://banquemisr.gateway.mastercard.com/api/rest/version/62";
     private string $checkout_url = "https://banquemisr.gateway.mastercard.com/static/checkout/checkout.min.js";
-    private string $merchant_id;
-    private string $merchant_password;
-    private string $merchent_name;
-    private float $amount;
-    private string $currency;
-    private string $order_id;
-    private string $description;
-    private string $success_url;
-    private string $fail_url;
+    private $merchant_id;
+    private $merchant_password;
+    private $merchent_name;
+    private $amount;
+    private $currency;
+    private $order_id;
+    private $description;
+    private $error_response;
 
     public function __construct()
     {
         $this->merchant_id = config("payment-bank-misr.merchant.id");
         $this->merchant_password = config("payment-bank-misr.merchant.password");
         $this->merchent_name = config("payment-bank-misr.merchant.name");
-
         $this->currency = config("payment-bank-misr.currency");
-        $this->success_url = config("payment-bank-misr.success_url");
-        $this->fail_url = config("payment-bank-misr.fail_url");
+
+        $this->handelRedirects();
     }
 
     function requiredFields(): array
@@ -48,31 +48,19 @@ class BankMisr implements RequiredFields
         ];
     }
 
-    public function setOrderId($id) : self
+    public function setOrderId($id): self
     {
         $this->order_id = $id;
         return $this;
     }
 
-    public function setAmount($amount) : self
+    public function setAmount($amount): self
     {
         $this->amount = $amount;
         return $this;
     }
 
-    public function setSuccessUrl($url) : self
-    {
-        $this->success_url = $url;
-        return $this;
-    }
-
-    public function setFailUrl($url) : self
-    {
-        $this->fail_url = $url;
-        return $this;
-    }
-
-    public function setDescription($description) : self
+    public function setDescription($description): self
     {
         $this->description = $description;
         return $this;
@@ -81,12 +69,12 @@ class BankMisr implements RequiredFields
     /**
      * @throws Exception
      */
-    private function generateSession() : bool|string
+    private function generateSession(): bool|string
     {
         $this->requiredFieldsShouldExist();
 
-        $request = Http::withBasicAuth("merchant." . $this->merchant_id, $this->merchant_password)
-            ->post($this->api . "/merchant/{$this->merchant_id}/session", [
+        $request = Http::withBasicAuth("merchant.".$this->merchant_id, $this->merchant_password)
+            ->post($this->api."/merchant/{$this->merchant_id}/session", [
                 "apiOperation" => "CREATE_CHECKOUT_SESSION",
                 "interaction" => [
                     "operation" => "PURCHASE",
@@ -100,17 +88,20 @@ class BankMisr implements RequiredFields
                 ],
             ]);
 
-        if(!$request->successful()){
+        if (!$request->successful()) {
+            $this->error_response = $request->json();
             return false;
         }
 
         $data = $request->json();
 
-        if(!isset($data['result'] , $data['session'] , $data['successIndicator'])){
+        if (!isset($data['result'], $data['session'], $data['successIndicator'])) {
+            $this->error_response = $data;
             return false;
         }
 
-        if($data['result'] != "SUCCESS"){
+        if ($data['result'] != "SUCCESS") {
+            $this->error_response = $data;
             return false;
         }
 
@@ -121,15 +112,15 @@ class BankMisr implements RequiredFields
     /**
      * @throws Exception
      */
-    public function getForm() : bool|string
+    public function getForm(): bool|string
     {
         $session_id = $this->generateSession();
 
         if (!$session_id) {
-            return false;
+            throw new Exception("Error while generating session: ".json_encode($this->error_response));
         }
 
-        return view("payment-bank-misr::form", [
+        return view("bank-misr::form", [
             "session_id" => $session_id,
             "checkout_url" => $this->checkout_url,
             "merchant_name" => $this->merchent_name,

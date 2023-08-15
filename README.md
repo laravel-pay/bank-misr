@@ -3,7 +3,8 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/laravel-pay/bank-misr.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/bank-misr)
 [![Total Downloads](https://img.shields.io/packagist/dt/laravel-pay/bank-misr.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/bank-misr)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Bank Misr Documentation can be found here
+<a href="https://banquemisr.gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html?locale=en_US">https://banquemisr.gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html?locale=en_US <a/>
 
 ## Installation
 
@@ -11,13 +12,6 @@ You can install the package via composer:
 
 ```bash
 composer require laravel-pay/bank-misr
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="bank-misr-migrations"
-php artisan migrate
 ```
 
 You can publish the config file with:
@@ -30,7 +24,17 @@ This is the contents of the published config file:
 
 ```php
 return [
+    "merchant" => [
+        "id" => env("BANK_MISR_MERCHANT_ID"),
+        "password" => env("BANK_MISR_MERCHANT_PASSWORD"),
+        "name" => env("BANK_MISR_MERCHANT_NAME"),
+    ],
+    "currency" => "EGP",
+
+    "success_url" => env("BANK_MISR_SUCCESS_URL"),
+    "fail_url" => env("BANK_MISR_FAIL_URL"),
 ];
+
 ```
 
 Optionally, you can publish the views using
@@ -42,8 +46,27 @@ php artisan vendor:publish --tag="bank-misr-views"
 ## Usage
 
 ```php
-$bankMisr = new LaravelPay\BankMisr();
-echo $bankMisr->echoPhrase('Hello, LaravelPay!');
+Route::get("/" , function(){
+    $form = BankMisr::setOrderId(11111)
+        ->setSuccessUrl("success")
+        ->setFailUrl("fail")
+        ->setAmount(100.12)
+        ->setDescription("test")
+        ->getForm();
+
+    return view("welcome" , [
+        "form" => $form
+    ]);
+});
+
+
+Route::get("/success" , function(){
+    dd("success" , request()->all());
+})->name("success");
+
+Route::get("/fail" , function(){
+    dd("fail" , request()->all());
+})->name("fail");
 ```
 
 ## Testing

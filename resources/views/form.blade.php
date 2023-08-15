@@ -1,8 +1,8 @@
 <script src="{{ $checkout_url }}" data-error="{{ $fail_url  }}"  data-cancel="{{ $fail_url }}"></script>
 <script type="text/javascript">
-(window).on("load", function() {
+window.onload = function() {
     Checkout.showPaymentPage();
-});
+};
 
 Checkout.configure({
     session: {
@@ -15,4 +15,4 @@ Checkout.configure({
 
     }
 });
-</script>'
+</script>
