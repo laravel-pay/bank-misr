@@ -7,6 +7,7 @@
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/laravel-pay/bank-misr/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-pay/bank-misr/?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/laravel-pay/bank-misr.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/bank-misr)
 
+Bank Misr (EGYPT) driver for the Laravel Pay package.
 
 ## Contents
 
@@ -21,6 +22,8 @@
 
 
 ## Installation
+
+<a href="https://banquemisr.gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html?locale=en_US">DOCS<a/>
 
 You can install the package via composer:
 
