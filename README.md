@@ -1,14 +1,14 @@
-## Laravel APN (Apple Push) Notification Channel
+## Bank Misr (EGYPT)
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/laravel-notification-channels/apn.svg?style=flat-square)](https://packagist.org/packages/laravel-notification-channels/apn)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/laravel-pay/bank-misr.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/bank-misr)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/laravel-notification-channels/apn/master.svg?style=flat-square)](https://travis-ci.org/laravel-notification-channels/apn)
-[![StyleCI](https://styleci.io/repos/66449499/shield)](https://github.styleci.io/repos/66449499)
-[![Quality Score](https://img.shields.io/scrutinizer/g/laravel-notification-channels/apn.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-notification-channels/apn)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/laravel-notification-channels/apn/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-notification-channels/apn/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel-notification-channels/apn.svg?style=flat-square)](https://packagist.org/packages/laravel-notification-channels/apn)
+[![Build Status](https://img.shields.io/travis/laravel-pay/bank-misr/master.svg?style=flat-square)](https://travis-ci.org/laravel-pay/bank-misr)
+[![Quality Score](https://img.shields.io/scrutinizer/g/laravel-pay/bank-misr.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-pay/bank-misr)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/laravel-pay/bank-misr/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-pay/bank-misr/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/laravel-pay/bank-misr.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/bank-misr)
 
-This package makes it easy to send notifications using Apple Push (APN) with Laravel.
+Bank Misr Documentation can be found here
+<a href="https://banquemisr.gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html?locale=en_US">https://banquemisr.gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html?locale=en_US <a/>
 
 ## Contents
 
@@ -24,139 +24,70 @@ This package makes it easy to send notifications using Apple Push (APN) with Lar
 
 ## Installation
 
-Install this package with Composer:
+You can install the package via composer:
 
-    composer require laravel-notification-channels/apn
-
-### Setting up the APN service
-
-Before using the APN Service, [enable Push Notifications in your app](https://help.apple.com/xcode/mac/current/#/devdfd3d04a1). Then [create a APNS key under Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/authkeys/list) to generate a Key ID and .p8 file.
-
-Collect your Key ID, as well as your Team ID (displayed at the top right of the Apple Developer page) and app bundle ID and configure as necessary in `config/broadcasting.php`.
-
-## JWT Token Authentication
-
-```php
-'connections' => [
-    'apn' => [
-        'key_id' => env('APN_KEY_ID'),
-        'team_id' => env('APN_TEAM_ID'),
-        'app_bundle_id' => env('APN_BUNDLE_ID'),
-        // Enable either `private_key_path` or `private_key_content` depending on your environment
-        // 'private_key_path' => env('APN_PRIVATE_KEY'),
-        'private_key_content' => env('APN_PRIVATE_KEY'),
-        'private_key_secret' => env('APN_PRIVATE_SECRET'),
-        'production' => env('APN_PRODUCTION', true),
-    ],
-],
+```bash
+composer require laravel-pay/bank-misr
 ```
 
-See the [Establishing a token-based connection to APNs](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_token-based_connection_to_apns) which will guide you how to obtain the values of the necessary parameters.
+You can publish the config file with:
 
-## Using Certificate (.pem) Authentication
+```bash
+php artisan vendor:publish --tag="bank-misr-config"
+```
+
+This is the contents of the published config file:
 
 ```php
-'connections' => [
-    'apn' => [
-        'app_bundle_id' => env('APN_BUNDLE_ID'),
-        'certificate_path' => env('APN_CERTIFICATE_PATH'),
-        'certificate_secret' => env('APN_CERTIFICATE_SECRET'),
-        'production' => env('APN_PRODUCTION', true),
+return [
+    "merchant" => [
+        "id" => env("BANK_MISR_MERCHANT_ID"),
+        "password" => env("BANK_MISR_MERCHANT_PASSWORD"),
+        "name" => env("BANK_MISR_MERCHANT_NAME"),
     ],
-],
+    "currency" => "EGP",
+
+    "success_url" => env("BANK_MISR_SUCCESS_URL"),
+    "fail_url" => env("BANK_MISR_FAIL_URL"),
+];
+
 ```
-If you are connecting with certificate based APNs, `key_id` and `team_id` are not needed. You can refer to [Send a Push Notification Using a Certificate](https://developer.apple.com/documentation/usernotifications/sending_push_notifications_using_command-line_tools#3694578)
 
-See the [Establishing a certificate-based connection to APNs](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns) which will guide you how to obtain the values of the necessary parameters.
+Optionally, you can publish the views using
 
-See the [`pushok` docs](https://github.com/edamov/pushok) for more information about what arguments can be supplied to the client.
+```bash
+php artisan vendor:publish --tag="bank-misr-views"
+```
 
 ## Usage
 
-You can now send messages to APN by creating a ApnMessage:
-
 ```php
-use NotificationChannels\Apn\ApnChannel;
-use NotificationChannels\Apn\ApnMessage;
-use Illuminate\Notifications\Notification;
+Route::get("/" , function(){
+    $form = BankMisr::setOrderId(11111)
+        ->setSuccessUrl("success")
+        ->setFailUrl("fail")
+        ->setAmount(100.12)
+        ->setDescription("test")
+        ->getForm();
 
-class AccountApproved extends Notification
-{
-    public function via($notifiable)
-    {
-        return [ApnChannel::class];
-    }
+    return view("welcome" , [
+        "form" => $form
+    ]);
+});
 
-    public function toApn($notifiable)
-    {
-        return ApnMessage::create()
-            ->badge(1)
-            ->title('Account approved')
-            ->body("Your {$notifiable->service} account was approved!");
-    }
-}
-```
 
-To see more of the methods available to you when creating a message please see the [`ApnMessage` source](https://github.com/laravel-notification-channels/apn/blob/master/src/ApnMessage.php).
+Route::get("/success" , function(){
+    dd("success" , request()->all());
+})->name("success");
 
-In your `notifiable` model, make sure to include a `routeNotificationForApn()` method, which return one or an array of tokens.
-
-```php
-public function routeNotificationForApn()
-{
-    return $this->apn_token;
-}
-```
-
-### Per-message configuration
-
-If you need to provide a custom configuration for a message you can provide an instance of a [Pushok](https://github.com/edamov/pushok) client and it will be used instead of the default one.
-
-```php
-$customClient = new Pushok\Client(Pushok\AuthProvider\Token::create($options));
-
-return ApnMessage::create()
-    ->title('Account approved')
-    ->body("Your {$notifiable->service} account was approved!")
-    ->via($customClient)
-```
-
-### VoIP push notifications
-
-Sending VoIP push notifications is very similar. You just need to use the `ApnVoipChannel` channel with `ApnVoipMessage` (which has the same API as a regular `ApnMessage`).
-
-```php
-use NotificationChannels\Apn\ApnVoipChannel;
-use NotificationChannels\Apn\ApnVoipMessage;
-use Illuminate\Notifications\Notification;
-
-class AccountApproved extends Notification
-{
-    public function via($notifiable)
-    {
-        return [ApnVoipChannel::class];
-    }
-
-    public function toApnVoip($notifiable)
-    {
-        return ApnVoipMessage::create()
-            ->badge(1);
-    }
-}
-```
-
-In your `notifiable` model, make sure to include a `routeNotificationForApnVoip()` method, which return one or an array of tokens.
-
-```php
-public function routeNotificationForApnVoip()
-{
-    return $this->apn_voip_token;
-}
+Route::get("/fail" , function(){
+    dd("fail" , request()->all());
+})->name("fail");
 ```
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
 
 ## Testing
 
@@ -166,7 +97,7 @@ $ composer test
 
 ## Security
 
-If you discover any security related issues, please email info@fruitcake.nl instead of using the issue tracker.
+Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
 
 ## Contributing
 
@@ -174,7 +105,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Credits
 
-- [Fruitcake](https://github.com/fruitcake)
+- [elsayed85](https://github.com/elsayed85)
 - [All Contributors](../../contributors)
 
 ## License
