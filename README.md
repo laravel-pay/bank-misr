@@ -62,40 +62,29 @@ php artisan vendor:publish --tag="bank-misr-views"
 
 ## Usage
 
-
-1. add this to your .env file
 ```php
-FAWRY_STAGING_MERCHANT=""
-FAWRY_STAGING_SECRET=""
-```
-2. Pay Route
-```php
-Route::get("/fawry" , function(){
-    $form = Fawry::setOnStagingMode()
+Route::get("/" , function(){
+    $form = BankMisr::setOrderId(11111)
+        ->setSuccessUrl("success")
+        ->setFailUrl("fail")
         ->setAmount(100.12)
-        ->setUserId(11111)
-        ->setUserFirstName("ahmed")
-        ->setUserLastName("elsayed")
-        ->setUserEmail("ahmed_elsayed@gmail.com")
-        ->setUserPhone("01000000000")
-        ->pay();
+        ->setDescription("test")
+        ->getForm();
 
     return view("welcome" , [
-        "form" => $form['html']
+        "form" => $form
     ]);
 });
+
+
+Route::get("/success" , function(){
+    dd("success" , request()->all());
+})->name("success");
+
+Route::get("/fail" , function(){
+    dd("fail" , request()->all());
+})->name("fail");
 ```
-
-3. Verify Route <br>
-   **_note : you can change the verify route name in config file_**
-
-```php
-Route::get("/fawry/verify" , function(){
-    $response = Fawry::setOnStagingMode()->verify();
-    dd($response);
-})->name("fawry.verify");
-```
-
 
 ## Changelog
 
