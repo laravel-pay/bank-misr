@@ -16,7 +16,8 @@ class BankMisrServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('bank-misr')
-            ->hasConfigFile("payment-bank-misr")
-            ->hasViews();
+            ->hasConfigFile('payment-bank-misr')
+            ->hasTranslations()
+            ->hasViews('bank-misr');
     }
 }
