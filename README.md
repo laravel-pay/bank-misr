@@ -23,8 +23,6 @@ Bank Misr (EGYPT) driver for the Laravel Pay package.
 
 ## Installation
 
-<a href="https://banquemisr.gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html?locale=en_US">DOCS<a/>
-
 You can install the package via composer:
 
 ```bash
