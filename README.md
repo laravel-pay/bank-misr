@@ -1,11 +1,11 @@
 ## Bank Misr (EGYPT)
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/laravel-pay/fawry.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/fawry)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/laravel-pay/bank-misr.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/bank-misr)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/laravel-pay/fawry/master.svg?style=flat-square)](https://travis-ci.org/laravel-pay/fawry)
-[![Quality Score](https://img.shields.io/scrutinizer/g/laravel-pay/fawry.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-pay/fawry)
-[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/laravel-pay/fawry/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-pay/fawry/?branch=master)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel-pay/fawry.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/fawry)
+[![Build Status](https://img.shields.io/travis/laravel-pay/bank-misr/master.svg?style=flat-square)](https://travis-ci.org/laravel-pay/bank-misr)
+[![Quality Score](https://img.shields.io/scrutinizer/g/laravel-pay/bank-misr.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-pay/bank-misr)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/laravel-pay/bank-misr/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/laravel-pay/bank-misr/?branch=master)
+[![Total Downloads](https://img.shields.io/packagist/dt/laravel-pay/bank-misr.svg?style=flat-square)](https://packagist.org/packages/laravel-pay/bank-misr)
 
 Fawry is a Laravel package for the Fawry payment gateway (EGYPT).
 
