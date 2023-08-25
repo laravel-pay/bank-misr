@@ -86,44 +86,43 @@ class BankMisr implements RequiredFields
      */
     private function generateSession(): bool|string
     {
-        $this->requiredFieldsShouldExist();
+        try {
+            $this->requiredFieldsShouldExist();
 
-        $request = Http::withBasicAuth('merchant.'.$this->merchant_id, $this->merchant_password)
-            ->post($this->api."/merchant/{$this->merchant_id}/session", [
-                'apiOperation' => 'CREATE_CHECKOUT_SESSION',
-                'interaction' => [
-                    'operation' => 'PURCHASE',
-                    'returnUrl' => $this->success_url,
-                ],
-                'order' => [
-                    'id' => $this->order_id,
-                    'amount' => $this->amount,
-                    'currency' => $this->currency,
-                    'description' => $this->description,
-                ],
-            ]);
+            $request = Http::withBasicAuth('merchant.' . $this->merchant_id, $this->merchant_password)
+                ->post($this->api . "/merchant/{$this->merchant_id}/session", [
+                    'apiOperation' => 'CREATE_CHECKOUT_SESSION',
+                    'interaction' => [
+                        'operation' => 'PURCHASE',
+                        'returnUrl' => $this->success_url,
+                    ],
+                    'order' => [
+                        'id' => $this->order_id,
+                        'amount' => $this->amount,
+                        'currency' => $this->currency,
+                        'description' => $this->description,
+                    ],
+                ]);
 
-        $data = $request->json();
+            $data = $request->json();
 
-        if (! $request->successful()) {
-            $this->error_response = $data;
+            if (!$request->successful()) {
+                throw new Exception('Request not successful: ' . json_encode($data));
+            }
 
+            if (!isset($data['result'], $data['session'], $data['successIndicator'])) {
+                throw new Exception('Missing required data in response: ' . json_encode($data));
+            }
+
+            if ($data['result'] != 'SUCCESS') {
+                throw new Exception('Result not successful: ' . json_encode($data));
+            }
+
+            return $data['session']['id'];
+        } catch (Exception $e) {
+            $this->error_response = $e->getMessage();
             return false;
         }
-
-        if (! isset($data['result'], $data['session'], $data['successIndicator'])) {
-            $this->error_response = $data;
-
-            return false;
-        }
-
-        if ($data['result'] != 'SUCCESS') {
-            $this->error_response = $data;
-
-            return false;
-        }
-
-        return $data['session']['id'];
     }
 
     /**
@@ -133,8 +132,8 @@ class BankMisr implements RequiredFields
     {
         $session_id = $this->generateSession();
 
-        if (! $session_id) {
-            throw new Exception('Error while generating session: '.json_encode($this->error_response));
+        if (!$session_id) {
+            throw new Exception('Error while generating session: ' . json_encode($this->error_response));
         }
 
         return view('bank-misr::form', [
